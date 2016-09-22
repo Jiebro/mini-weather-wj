@@ -11,7 +11,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle saveInstanceState)
     {
-        super.onCreate(saveInstanceState);
+        super.onCreate(saveInstanceState);//项目中的任何活动都应该重写Activity的onCreate方法
         setContentView(R.layout.weather_info);
     }
 }
