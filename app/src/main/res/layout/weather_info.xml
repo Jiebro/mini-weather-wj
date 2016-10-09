@@ -118,7 +118,7 @@
                 android:layout_below="@id/humidity"
                 android:layout_marginLeft="15.0dp"
                 android:singleLine="true"
-                android:text="温度:5℃"
+                android:text="温度：5℃"
                 android:textColor="@android:color/white"
                 android:textSize="15.0sp"/>
 
@@ -231,7 +231,7 @@
                     android:singleLine="true"
                     android:text="-2℃～7℃"
                     android:textColor="@android:color/white"
-                    android:textSize="30.0dip"/>
+                    android:textSize="20sp"/>
 
                 <!-- 天气状况 -->
                 <TextView
