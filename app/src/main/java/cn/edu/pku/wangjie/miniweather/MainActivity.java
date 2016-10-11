@@ -3,7 +3,11 @@ package cn.edu.pku.wangjie.miniweather;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.graphics.Matrix;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.net.http.HttpResponseCache;
+import android.os.Build;
 import android.os.Bundle;
 
 import android.os.Handler;
@@ -11,6 +15,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,7 +46,8 @@ import cn.edu.pku.wangjie.miniweather.pku.ss.wj.util.NetUtil;
  */
 public class MainActivity extends Activity implements View.OnClickListener {
     private ImageView mUpdateBtn;
-    private TextView cityTv, timeTv, humidityTv, weekTv, pmDataTv, pmQualityTv, temperatureTv, climateTv, windTv;
+    private TextView cityTv, timeTv, humidityTv, weekTv, pmDataTv, pmQualityTv,
+                     cur_temperatureTv,temperatureTv, climateTv, windTv;
     private ImageView weatherImg, pmImg;
 
     private static final int UPDATE_TODAY_WEATHER = 1;
@@ -65,6 +71,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         weekTv = (TextView)findViewById(R.id.week_today);
         pmDataTv = (TextView)findViewById(R.id.pm_data);
         pmQualityTv = (TextView)findViewById(R.id.pm2_5_quality);
+        cur_temperatureTv = (TextView)findViewById(R.id.cur_temperature);
         temperatureTv = (TextView)findViewById(R.id.temperature);
         climateTv = (TextView)findViewById(R.id.climate);
         windTv = (TextView)findViewById(R.id.wind);
@@ -77,6 +84,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         weekTv.setText("N/A");
         pmDataTv.setText("N/A");
         pmQualityTv.setText("N/A");
+        cur_temperatureTv.setText("N/A");
         temperatureTv.setText("N/A");
         climateTv.setText("N/A");
         windTv.setText("N/A");
@@ -89,9 +97,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
         weekTv.setText(todayWeather.getDate());
         pmDataTv.setText(todayWeather.getPm25());
         pmQualityTv.setText(todayWeather.getQuality());
+        cur_temperatureTv.setText("温度：" + todayWeather.getWendu());
         temperatureTv.setText(todayWeather.getHigh() + "~" + todayWeather.getLow());
         climateTv.setText(todayWeather.getType());
         windTv.setText("风力：" + todayWeather.getFengli());
+
+       
 
         Toast.makeText(MainActivity.this,"更新成功",Toast.LENGTH_LONG).show();
     }
@@ -103,6 +114,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.weather_info);
         mUpdateBtn = (ImageView)findViewById(R.id.title_update_btn);
         mUpdateBtn.setOnClickListener(this);
+
+        if(NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {
+            Log.d("myWeather","网络OK");
+            Toast.makeText(MainActivity.this,"网络OK",Toast.LENGTH_LONG).show();
+        }
+        else {
+            Log.d("myWeather","网络挂了");
+            Toast.makeText(MainActivity.this,"网络挂了",Toast.LENGTH_LONG).show();
+        }
         initView();
     }
 
@@ -116,13 +136,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
             if(NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {
                 Log.d("myWeather","网络OK");
                 queryWeatherCode(cityCode);
-
             }
             else {
                 Log.d("myWeather","网络挂了");
                 Toast.makeText(MainActivity.this,"网络挂了",Toast.LENGTH_LONG).show();
             }
-            queryWeatherCode(cityCode);
         }
     }
 
@@ -163,6 +181,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
+                }
+                finally {
+                    if (connection != null) {
+                        connection.disconnect();
+                    }
                 }
             }
         }).start();
@@ -224,11 +247,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
                                 dateCount++;
                             } else if (xmlPullParser.getName().equals("high") && highCount == 0) {
                                 eventType = xmlPullParser.next();
-                                todayWeather.setHigh(xmlPullParser.getText());
+                                todayWeather.setHigh(xmlPullParser.getText().substring(2).trim());
                                 highCount++;
                             } else if (xmlPullParser.getName().equals("low") && lowCount == 0) {
                                 eventType = xmlPullParser.next();
-                                todayWeather.setLow(xmlPullParser.getText());
+                                todayWeather.setLow(xmlPullParser.getText().substring(2).trim());
                                 lowCount++;
                             } else if (xmlPullParser.getName().equals("type") && typeCount == 0) {
                                 eventType = xmlPullParser.next();

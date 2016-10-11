@@ -176,6 +176,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="5.0dip"
                         android:src="@drawable/biz_plugin_weather_0_50"/>
+
                 </LinearLayout>
 
                 <!-- 污染等级 -->
