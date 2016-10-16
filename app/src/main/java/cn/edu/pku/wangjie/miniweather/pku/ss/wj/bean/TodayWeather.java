@@ -18,6 +18,7 @@ public class TodayWeather {
     private String low;
     private String type;
 
+
     public String getCity() {
         return city;
     }
