@@ -1,21 +1,14 @@
 package cn.edu.pku.wangjie.miniweather;
 
-import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Matrix;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.net.http.HttpResponseCache;
-import android.os.Build;
 import android.os.Bundle;
 
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,7 +17,6 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,10 +25,6 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.util.logging.LogRecord;
-import java.util.zip.GZIPInputStream;
 
 import cn.edu.pku.wangjie.miniweather.pku.ss.wj.bean.TodayWeather;
 import cn.edu.pku.wangjie.miniweather.pku.ss.wj.util.NetUtil;
@@ -45,8 +33,9 @@ import cn.edu.pku.wangjie.miniweather.pku.ss.wj.util.NetUtil;
  * Created by admin on 2016/9/21.
  */
 public class MainActivity extends Activity implements View.OnClickListener {
+    private ImageView mCitySelect;
     private ImageView mUpdateBtn;
-    private TextView cityTv, timeTv, humidityTv, weekTv, pmDataTv, pmQualityTv,
+    private TextView title_cityTv,cityTv, timeTv, humidityTv, weekTv, pmDataTv, pmQualityTv,
                      cur_temperatureTv,temperatureTv, climateTv, windTv;
     private ImageView weatherImg, pmImg;
 
@@ -65,6 +54,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     };
 
     private void initView() {
+        title_cityTv = (TextView)findViewById(R.id.title_city_name);
         cityTv = (TextView)findViewById(R.id.city);
         timeTv = (TextView)findViewById(R.id.time);
         humidityTv = (TextView)findViewById(R.id.humidity);
@@ -78,6 +68,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         weatherImg = (ImageView)findViewById(R.id.weather_img);
         pmImg = (ImageView)findViewById(R.id.pm2_5_img);
 
+        title_cityTv.setText("N/A");
         cityTv.setText("N/A");
         timeTv.setText("N/A");
         humidityTv.setText("N/A");
@@ -91,13 +82,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
     private void updateTodayWeather(TodayWeather todayWeather) {
         Log.d("myapp3",todayWeather.toString());
+        title_cityTv.setText(todayWeather.getCity() + "天气");
         cityTv.setText(todayWeather.getCity());
         timeTv.setText(todayWeather.getUpdatetime() + "发布");
         humidityTv.setText("湿度：" + todayWeather.getShidu());
         weekTv.setText(todayWeather.getDate());
         pmDataTv.setText(todayWeather.getPm25());
         pmQualityTv.setText(todayWeather.getQuality());
-        cur_temperatureTv.setText("温度：" + todayWeather.getWendu());
+        cur_temperatureTv.setText("温度：" + todayWeather.getWendu() + "℃");
         temperatureTv.setText(todayWeather.getHigh() + "~" + todayWeather.getLow());
         climateTv.setText(todayWeather.getType());
         windTv.setText("风力：" + todayWeather.getFengli());
@@ -186,7 +178,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             case "中雨":
                 weatherImg.setImageResource(R.drawable.biz_plugin_weather_zhongyu);
                 break;
-            
+
         }
 //        weatherImg.setImageResource(R.drawable.biz_plugin_weather_baoxue);
 
@@ -201,6 +193,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mUpdateBtn = (ImageView)findViewById(R.id.title_update_btn);
         mUpdateBtn.setOnClickListener(this);
 
+        mCitySelect = (ImageView)findViewById(R.id.title_city_manager);
+        mCitySelect.setOnClickListener(this);
         if(NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {
             Log.d("myWeather","网络OK");
             Toast.makeText(MainActivity.this,"网络OK",Toast.LENGTH_LONG).show();
@@ -214,6 +208,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
+        if (view.getId() == R.id.title_city_manager) {
+            Intent i = new Intent(this, SelectCity.class);
+            //startActivity(i);
+            startActivityForResult(i,1);
+        }
         if(view.getId() == R.id.title_update_btn){
             SharedPreferences sharedPreferences = getSharedPreferences("config",MODE_PRIVATE);
             String cityCode = sharedPreferences.getString("main_city_code","101010100");
@@ -229,7 +228,20 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         }
     }
-
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            String newCityCode = data.getStringExtra("cityCode");
+            Log.d("myWeather","选择的城市的代码为：" + newCityCode);
+            if (NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {
+                Log.d("myWeather","网络OK");
+                queryWeatherCode(newCityCode);
+            }
+            else {
+                Log.d("myWeather","网络挂了");
+                Toast.makeText(this,"网络挂了",Toast.LENGTH_LONG).show();
+            }
+        }
+    }
     private void queryWeatherCode(String cityCode){
         final String address = "http://wthrcdn.etouch.cn/WeatherApi?citykey=" + cityCode;
         Log.d("myWeather",address);
