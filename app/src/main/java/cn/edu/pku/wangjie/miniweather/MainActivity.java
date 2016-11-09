@@ -25,7 +25,10 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
+import cn.edu.pku.wangjie.miniweather.pku.ss.wj.app.MyApplication;
+import cn.edu.pku.wangjie.miniweather.pku.ss.wj.bean.City;
 import cn.edu.pku.wangjie.miniweather.pku.ss.wj.bean.TodayWeather;
 import cn.edu.pku.wangjie.miniweather.pku.ss.wj.util.NetUtil;
 
@@ -38,6 +41,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private TextView title_cityTv,cityTv, timeTv, humidityTv, weekTv, pmDataTv, pmQualityTv,
                      cur_temperatureTv,temperatureTv, climateTv, windTv;
     private ImageView weatherImg, pmImg;
+    private String code = "101010100";
 
     private static final int UPDATE_TODAY_WEATHER = 1;
 
@@ -80,6 +84,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         climateTv.setText("N/A");
         windTv.setText("N/A");
     }
+
     private void updateTodayWeather(TodayWeather todayWeather) {
         Log.d("myapp3",todayWeather.toString());
         title_cityTv.setText(todayWeather.getCity() + "天气");
@@ -88,7 +93,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
         humidityTv.setText("湿度：" + todayWeather.getShidu());
         weekTv.setText(todayWeather.getDate());
         pmDataTv.setText(todayWeather.getPm25());
-        pmQualityTv.setText(todayWeather.getQuality());
+
+        //质量检测
+        if (todayWeather.getQuality() == null){
+            pmQualityTv.setText("N/A");
+        }
+        else{
+            pmQualityTv.setText(todayWeather.getQuality());
+        }
+
+        //pmQualityTv.setText(todayWeather.getQuality());
         cur_temperatureTv.setText("温度：" + todayWeather.getWendu() + "℃");
         temperatureTv.setText(todayWeather.getHigh() + "~" + todayWeather.getLow());
         climateTv.setText(todayWeather.getType());
@@ -180,9 +194,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 break;
 
         }
-//        weatherImg.setImageResource(R.drawable.biz_plugin_weather_baoxue);
 
         Toast.makeText(MainActivity.this,"更新成功",Toast.LENGTH_LONG).show();
+    }
+
+    private void setPMImag(TodayWeather todayWeather){
+
     }
     @Override
     protected void onCreate(Bundle saveInstanceState)
@@ -215,7 +232,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
         if(view.getId() == R.id.title_update_btn){
             SharedPreferences sharedPreferences = getSharedPreferences("config",MODE_PRIVATE);
-            String cityCode = sharedPreferences.getString("main_city_code","101010100");
+            String cityCode = sharedPreferences.getString("main_city_code",code);
             Log.d("myWeather",cityCode);
 
             if(NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {
@@ -231,6 +248,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1 && resultCode == RESULT_OK) {
             String newCityCode = data.getStringExtra("cityCode");
+            code = newCityCode;
             Log.d("myWeather","选择的城市的代码为：" + newCityCode);
             if (NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {
                 Log.d("myWeather","网络OK");
@@ -242,7 +260,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         }
     }
-    private void queryWeatherCode(String cityCode){
+
+    private void queryWeatherCode(final String cityCode){
         final String address = "http://wthrcdn.etouch.cn/WeatherApi?citykey=" + cityCode;
         Log.d("myWeather",address);
         new Thread(new Runnable() {
@@ -268,6 +287,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     String responseStr = response.toString();
                     Log.d("myWeather",responseStr);
                     todayWeather = parseXML(responseStr);
+
                     if (todayWeather != null) {
                         //Log.d("myapp2",todayWeather.toString());
                         Message msg = new Message();
@@ -289,6 +309,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }).start();
 
     }
+
 
     private TodayWeather parseXML(String xmlDate) {
         TodayWeather todayWeather = null;
@@ -371,6 +392,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
         return todayWeather;
     }
+
 
 }
 

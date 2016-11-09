@@ -9,7 +9,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cn.edu.pku.wangjie.miniweather.pku.ss.wj.bean.City;
 import cn.edu.pku.wangjie.miniweather.pku.ss.wj.db.CityDB;
@@ -33,6 +35,7 @@ public class MyApplication extends Application{
 
         initCityList();
     }
+
 
     private void initCityList() {
         mCityList = new ArrayList<City>();
