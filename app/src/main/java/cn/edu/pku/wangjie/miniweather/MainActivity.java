@@ -27,6 +27,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import cn.edu.pku.wangjie.miniweather.pku.ss.wj.MyHandler;
 import cn.edu.pku.wangjie.miniweather.pku.ss.wj.app.MyApplication;
 import cn.edu.pku.wangjie.miniweather.pku.ss.wj.bean.City;
 import cn.edu.pku.wangjie.miniweather.pku.ss.wj.bean.TodayWeather;
@@ -198,9 +202,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         Toast.makeText(MainActivity.this,"更新成功",Toast.LENGTH_LONG).show();
     }
 
-    private void setPMImag(TodayWeather todayWeather){
 
-    }
     @Override
     protected void onCreate(Bundle saveInstanceState)
     {
@@ -237,7 +239,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             if(NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {
                 Log.d("myWeather","网络OK");
-                queryWeatherCode(cityCode);
+                saxQueryWeatherCode(cityCode);
             }
             else {
                 Log.d("myWeather","网络挂了");
@@ -260,7 +262,62 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         }
     }
+    private void saxQueryWeatherCode(final String cityCode){
+        final String address = "http://wthrcdn.etouch.cn/WeatherApi?citykey=" + cityCode;
+        Log.d("myWeather",address);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                HttpURLConnection  connection = null;
+                TodayWeather todayWeather = null;
+                try {
+                    URL url = new URL(address);
+                    connection = (HttpURLConnection)url.openConnection();
 
+                    connection.setRequestMethod("GET");
+                    connection.setConnectTimeout(8000);
+                    connection.setReadTimeout(8000);
+                    InputStream in = connection.getInputStream();
+
+                    Log.d("myWeather","prepare parse");
+                    todayWeather = saxParseXml(in);
+                    if (todayWeather == null)
+                        Log.d("myWeather","todayweather is null");
+                    if (todayWeather != null) {
+                        Log.d("myapp2",todayWeather.toString());
+                        Message msg = new Message();
+                        msg.what = UPDATE_TODAY_WEATHER;
+                        msg.obj = todayWeather;
+                        mHandler.sendMessage(msg);
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                finally {
+                    if (connection != null) {
+                        connection.disconnect();
+                    }
+                }
+            }
+        }).start();
+    }
+    private TodayWeather saxParseXml(InputStream in) {
+        try {
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            SAXParser parser = factory.newSAXParser();
+            MyHandler myHandler = new MyHandler();
+            parser.parse(in, myHandler);
+            TodayWeather todayWeather = myHandler.getTodayWeather();
+            in.close();
+            return todayWeather;
+        }
+        catch (Exception e){
+
+        }
+        return null;
+    }
     private void queryWeatherCode(final String cityCode){
         final String address = "http://wthrcdn.etouch.cn/WeatherApi?citykey=" + cityCode;
         Log.d("myWeather",address);
