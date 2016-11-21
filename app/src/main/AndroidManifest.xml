@@ -20,6 +20,11 @@
         <activity android:name=".SelectCity">
 
         </activity>
+        <service android:name=".MyService">
+
+        </service>
+
+
 
     </application>
 

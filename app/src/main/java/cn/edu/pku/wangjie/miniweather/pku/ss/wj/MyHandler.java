@@ -15,13 +15,11 @@ import cn.edu.pku.wangjie.miniweather.pku.ss.wj.bean.TodayWeather;
  */
 
 public class MyHandler extends DefaultHandler{
-   // private List<HashMap<String,String>> list = null;   //  解析后的XML内容
-    //private HashMap<String,String> map = null;  //存放当前需要记录的结点的内容
+
     private String currentTag = null;   //当前读取的XML结点
     private String currentValue = null; //当前XML结点的文本值
     private TodayWeather todayWeather = null;
-//    private String nName = null;    //需要解析的结点的名称
-//
+
     int fengxiangCount = 0;
     int fengliCount = 0;
     int dateCount = 0;
@@ -34,15 +32,19 @@ public class MyHandler extends DefaultHandler{
     }
 
     @Override
+    public void startDocument() throws SAXException {
+        super.startDocument();
+        todayWeather = new TodayWeather();
+    }
+
+    @Override
+    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+        super.startElement(uri, localName, qName, attributes);
+        currentTag = localName;
+    }
+    @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
         super.characters(ch, start, length);
-//        if (currentTag != null && map != null){
-//            currentValue = new String(ch,start,length);
-//            //if (currentValue != null && currentValue.equals(""))
-////            map.put(currentTag,currentValue);
-//        }
-//        currentTag = null;
-//        currentValue = null;
         currentValue = new String(ch,start,length);
 
             switch (currentTag) {
@@ -108,23 +110,6 @@ public class MyHandler extends DefaultHandler{
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         super.endElement(uri, localName, qName);
-    }
-    @Override
-    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        super.startElement(uri, localName, qName, attributes);
-//        if (qName.equals(nName)){
-           //map = new HashMap<String,String>();
-//        }
-        currentTag = localName;
-
-//
-    }
-
-    @Override
-    public void startDocument() throws SAXException {
-        super.startDocument();
-        //list = new ArrayList<HashMap<String, String>>();
-        todayWeather = new TodayWeather();
     }
 
     @Override

@@ -1,18 +1,29 @@
 package cn.edu.pku.wangjie.miniweather;
 
 import android.app.Activity;
+import android.app.IntentService;
+import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -26,6 +37,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -47,6 +60,18 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private ImageView weatherImg, pmImg;
     private String code = "101010100";
 
+    private IntentFilter intentFilter;
+    BReceiver mReceiver;
+
+    class BReceiver extends BroadcastReceiver{  //广播接收器 内部类
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Log.d("MyService","BroadcastReceiver ... ");
+        queryWeatherCode(code); //更新天气
+     }
+    }
+
     private static final int UPDATE_TODAY_WEATHER = 1;
 
     private Handler mHandler = new Handler() {
@@ -60,6 +85,61 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         }
     };
+
+    @Override
+    protected void onCreate(Bundle saveInstanceState)
+    {
+        super.onCreate(saveInstanceState);//项目中的任何活动都应该重写Activity的onCreate方法
+        setContentView(R.layout.weather_info);
+        mUpdateBtn = (ImageView)findViewById(R.id.title_update_btn);
+        mUpdateBtn.setOnClickListener(this);
+
+        mCitySelect = (ImageView)findViewById(R.id.title_city_manager);
+        mCitySelect.setOnClickListener(this);
+        if(NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {
+            Log.d("myWeather","网络OK");
+            Toast.makeText(MainActivity.this,"网络OK",Toast.LENGTH_LONG).show();
+        }
+        else {
+            Log.d("myWeather","网络挂了");
+            Toast.makeText(MainActivity.this,"网络挂了",Toast.LENGTH_LONG).show();
+        }
+        initView();
+
+        startService();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mReceiver = new BReceiver();
+        intentFilter = new IntentFilter();  //创建广播过滤器
+        intentFilter.addAction("UPDATE_TODAY_WEATHER");
+        registerReceiver(mReceiver,intentFilter);   //注册
+        queryWeatherCode(code);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopService(new Intent(this,MyService.class));
+    }
+
+    private void startService(){
+        Intent mIntent = new Intent(this,MyService.class);
+        startService(mIntent);
+    }
+
 
     private void initView() {
         title_cityTv = (TextView)findViewById(R.id.title_city_name);
@@ -113,26 +193,25 @@ public class MainActivity extends Activity implements View.OnClickListener {
         windTv.setText("风力：" + todayWeather.getFengli());
 
         //设置PM2.5图片
-        int pm25 = Integer.parseInt(todayWeather.getPm25());
-        if (pm25 >=0 && pm25 <= 50) {
+        if(todayWeather.getPm25() == null){ //该地方没有pm2.5信息
             pmImg.setImageResource(R.drawable.biz_plugin_weather_0_50);
         }
-        else if (pm25 >=51 && pm25 <= 100) {
-            pmImg.setImageResource(R.drawable.biz_plugin_weather_51_100);
-        }
-        else if (pm25 >= 101 && pm25 <= 150) {
-            pmImg.setImageResource(R.drawable.biz_plugin_weather_101_150);
-        }
-        else if (pm25 >= 151 && pm25 <= 200) {
-            pmImg.setImageResource(R.drawable.biz_plugin_weather_151_200);
-        }
-        else if (pm25 >= 201 && pm25 <= 300){
-            pmImg.setImageResource(R.drawable.biz_plugin_weather_201_300);
-        }
         else {
-            pmImg.setImageResource(R.drawable.biz_plugin_weather_greater_300);
+            int pm25 = Integer.parseInt(todayWeather.getPm25());
+            if (pm25 >= 0 && pm25 <= 50) {
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_0_50);
+            } else if (pm25 >= 51 && pm25 <= 100) {
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_51_100);
+            } else if (pm25 >= 101 && pm25 <= 150) {
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_101_150);
+            } else if (pm25 >= 151 && pm25 <= 200) {
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_151_200);
+            } else if (pm25 >= 201 && pm25 <= 300) {
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_201_300);
+            } else {
+                pmImg.setImageResource(R.drawable.biz_plugin_weather_greater_300);
+            }
         }
-
         //设置天气图片
         String weatherType = todayWeather.getType();
         switch (weatherType) {
@@ -203,27 +282,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
 
-    @Override
-    protected void onCreate(Bundle saveInstanceState)
-    {
-
-        super.onCreate(saveInstanceState);//项目中的任何活动都应该重写Activity的onCreate方法
-        setContentView(R.layout.weather_info);
-        mUpdateBtn = (ImageView)findViewById(R.id.title_update_btn);
-        mUpdateBtn.setOnClickListener(this);
-
-        mCitySelect = (ImageView)findViewById(R.id.title_city_manager);
-        mCitySelect.setOnClickListener(this);
-        if(NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {
-            Log.d("myWeather","网络OK");
-            Toast.makeText(MainActivity.this,"网络OK",Toast.LENGTH_LONG).show();
-        }
-        else {
-            Log.d("myWeather","网络挂了");
-            Toast.makeText(MainActivity.this,"网络挂了",Toast.LENGTH_LONG).show();
-        }
-        initView();
-    }
 
     @Override
     public void onClick(View view) {
@@ -239,7 +297,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             if(NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {
                 Log.d("myWeather","网络OK");
-                saxQueryWeatherCode(cityCode);
+                queryWeatherCode(cityCode);
             }
             else {
                 Log.d("myWeather","网络挂了");
@@ -262,6 +320,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         }
     }
+
+    //SAX 解析 XML文件 预处理
     private void saxQueryWeatherCode(final String cityCode){
         final String address = "http://wthrcdn.etouch.cn/WeatherApi?citykey=" + cityCode;
         Log.d("myWeather",address);
@@ -281,6 +341,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
                     Log.d("myWeather","prepare parse");
                     todayWeather = saxParseXml(in);
+
                     if (todayWeather == null)
                         Log.d("myWeather","todayweather is null");
                     if (todayWeather != null) {
@@ -303,6 +364,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         }).start();
     }
+
+    //SAX 解析 XML
     private TodayWeather saxParseXml(InputStream in) {
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -318,8 +381,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
         return null;
     }
-    private void queryWeatherCode(final String cityCode){
+    public void queryWeatherCode(final String cityCode){
         final String address = "http://wthrcdn.etouch.cn/WeatherApi?citykey=" + cityCode;
+        //final String address = "http://wthrcdn.etouch.cn/weather_mini?citykey=" + cityCode;
         Log.d("myWeather",address);
         new Thread(new Runnable() {
             @Override
@@ -344,7 +408,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     String responseStr = response.toString();
                     Log.d("myWeather",responseStr);
                     todayWeather = parseXML(responseStr);
-
+                    //todayWeather = parseJson(responseStr);
                     if (todayWeather != null) {
                         //Log.d("myapp2",todayWeather.toString());
                         Message msg = new Message();
@@ -450,6 +514,30 @@ public class MainActivity extends Activity implements View.OnClickListener {
         return todayWeather;
     }
 
+    private TodayWeather parseJson(String jsonData){
+        TodayWeather todayWeather = new TodayWeather();
+        try {
+                JSONObject jsonObject = new JSONObject(jsonData);
+                JSONObject dataObject = jsonObject.getJSONObject("data");
 
+                todayWeather.setWendu(dataObject.getString("wendu"));
+                JSONArray forecastArray = new JSONArray(dataObject.getString("forecast"));
+                JSONObject today = forecastArray.getJSONObject(0);
+                todayWeather.setFengli(today.getString("fengli"));
+                todayWeather.setFengxiang(today.getString("fengxiang"));
+                todayWeather.setHigh(today.getString("high"));
+                todayWeather.setLow(today.getString("low"));
+                todayWeather.setType(today.getString("type"));
+                todayWeather.setDate(today.getString("date"));
+                todayWeather.setPm25(dataObject.getString("aqi"));
+                todayWeather.setCity(dataObject.getString("city"));
+                return todayWeather;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
+
 
