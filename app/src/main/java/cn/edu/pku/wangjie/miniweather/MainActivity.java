@@ -1,28 +1,23 @@
 package cn.edu.pku.wangjie.miniweather;
 
 import android.app.Activity;
-import android.app.IntentService;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -36,16 +31,11 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import cn.edu.pku.wangjie.miniweather.pku.ss.wj.MyHandler;
-import cn.edu.pku.wangjie.miniweather.pku.ss.wj.app.MyApplication;
-import cn.edu.pku.wangjie.miniweather.pku.ss.wj.bean.City;
 import cn.edu.pku.wangjie.miniweather.pku.ss.wj.bean.TodayWeather;
 import cn.edu.pku.wangjie.miniweather.pku.ss.wj.util.NetUtil;
 
@@ -55,6 +45,7 @@ import cn.edu.pku.wangjie.miniweather.pku.ss.wj.util.NetUtil;
 public class MainActivity extends Activity implements View.OnClickListener {
     private ImageView mCitySelect;
     private ImageView mUpdateBtn;
+    private ProgressBar mUpdateProgressBar;
     private TextView title_cityTv,cityTv, timeTv, humidityTv, weekTv, pmDataTv, pmQualityTv,
                      cur_temperatureTv,temperatureTv, climateTv, windTv;
     private ImageView weatherImg, pmImg;
@@ -94,6 +85,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         mUpdateBtn = (ImageView)findViewById(R.id.title_update_btn);
         mUpdateBtn.setOnClickListener(this);
 
+        mUpdateProgressBar = (ProgressBar)findViewById(R.id.title_update_progress);
+
         mCitySelect = (ImageView)findViewById(R.id.title_city_manager);
         mCitySelect.setOnClickListener(this);
         if(NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {
@@ -116,7 +109,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         intentFilter = new IntentFilter();  //创建广播过滤器
         intentFilter.addAction("UPDATE_TODAY_WEATHER");
         registerReceiver(mReceiver,intentFilter);   //注册
-        queryWeatherCode(code);
     }
 
     @Override
@@ -133,6 +125,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onDestroy() {
         super.onDestroy();
         stopService(new Intent(this,MyService.class));
+        unregisterReceiver(mReceiver);
     }
 
     private void startService(){
@@ -278,7 +271,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         }
 
+
         Toast.makeText(MainActivity.this,"更新成功",Toast.LENGTH_LONG).show();
+
+        //恢复更新按钮
+        mUpdateBtn.setVisibility(View.VISIBLE);
+        mUpdateProgressBar.setVisibility(View.GONE);
     }
 
 
@@ -297,6 +295,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             if(NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {
                 Log.d("myWeather","网络OK");
+
                 queryWeatherCode(cityCode);
             }
             else {
@@ -382,6 +381,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
         return null;
     }
     public void queryWeatherCode(final String cityCode){
+
+        //设置旋转更新按钮
+        mUpdateBtn.setVisibility(View.INVISIBLE);
+        mUpdateProgressBar.setVisibility(View.VISIBLE);
+
         final String address = "http://wthrcdn.etouch.cn/WeatherApi?citykey=" + cityCode;
         //final String address = "http://wthrcdn.etouch.cn/weather_mini?citykey=" + cityCode;
         Log.d("myWeather",address);

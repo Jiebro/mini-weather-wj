@@ -11,7 +11,7 @@ import java.util.TimerTask;
 
 public class MyService extends Service {
     int counter = 0;
-    static  final int UPDATE_INTERVAL =1000*60;
+    static  final int UPDATE_INTERVAL =1000*60*60;
     private Timer timer = new Timer();
 
     @Nullable
