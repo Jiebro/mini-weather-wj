@@ -285,7 +285,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
     public void onClick(View view) {
         if (view.getId() == R.id.title_city_manager) {
             Intent i = new Intent(this, SelectCity.class);
-            //startActivity(i);
             startActivityForResult(i,1);
         }
         if(view.getId() == R.id.title_update_btn){
@@ -411,6 +410,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     }
                     String responseStr = response.toString();
                     Log.d("myWeather",responseStr);
+                    Thread.sleep(1000); //为了更新按钮旋转使天气查询延迟一秒
                     todayWeather = parseXML(responseStr);
                     //todayWeather = parseJson(responseStr);
                     if (todayWeather != null) {
@@ -424,8 +424,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
-                }
-                finally {
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
                     if (connection != null) {
                         connection.disconnect();
                     }
