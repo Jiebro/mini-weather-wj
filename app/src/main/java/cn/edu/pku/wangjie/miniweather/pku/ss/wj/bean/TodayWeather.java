@@ -18,6 +18,61 @@ public class TodayWeather {
     private String low;
     private String type;
 
+    private String yesterdayDate;
+    private String yesterdayHigh;
+    private String yesterdayLow;
+    private String yesterdayType;
+    private String yesterdayFengxiang;
+    private String yesterdayFengli;
+
+    public String getYesterdayDate() {
+        return yesterdayDate;
+    }
+
+    public void setYesterdayDate(String yesterdayDate) {
+        this.yesterdayDate = yesterdayDate;
+    }
+
+    public String getYesterdayHigh() {
+        return yesterdayHigh;
+    }
+
+    public void setYesterdayHigh(String yesterdayHigh) {
+        this.yesterdayHigh = yesterdayHigh;
+    }
+
+    public String getYesterdayLow() {
+        return yesterdayLow;
+    }
+
+    public void setYesterdayLow(String yesterdayLow) {
+        this.yesterdayLow = yesterdayLow;
+    }
+
+    public String getYesterdayType() {
+        return yesterdayType;
+    }
+
+    public void setYesterdayType(String yesterdayType) {
+        this.yesterdayType = yesterdayType;
+    }
+
+    public String getYesterdayFengxiang() {
+        return yesterdayFengxiang;
+    }
+
+    public void setYesterdayFengxiang(String yesterdayFengxiang) {
+        this.yesterdayFengxiang = yesterdayFengxiang;
+    }
+
+    public String getYesterdayFengli() {
+        return yesterdayFengli;
+    }
+
+    public void setYesterdayFengli(String yesterdayFengli) {
+        this.yesterdayFengli = yesterdayFengli;
+    }
+
 
     public String getCity() {
         return city;

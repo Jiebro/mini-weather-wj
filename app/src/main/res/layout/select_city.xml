@@ -43,7 +43,6 @@
         android:paddingLeft="10.0dip"
         android:paddingRight="30.0dip"
         android:paddingTop="8.0dip"
-        android:singleLine="true"
         android:background="@drawable/contact_search_box_edittext_keyword_background"
         android:textColor="#ff000000"
         android:textColorHint="#ffcccc"
@@ -53,7 +52,8 @@
         android:id="@+id/list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/search_edit">
+        android:layout_below="@id/search_edit"
+        android:background="#ff000000">
 
     </ListView>
 </RelativeLayout>
