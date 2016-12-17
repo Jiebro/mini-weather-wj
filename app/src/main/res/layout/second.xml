@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:text="星期四"
+            android:text="N/A"
             android:textColor="@android:color/white"
             android:textSize="15sp"/>
         <ImageView
@@ -33,7 +33,7 @@
             android:layout_below="@id/day3_weather"
             android:layout_marginTop="10dip"
             android:layout_centerHorizontal="true"
-            android:text="-2℃～7℃"
+            android:text="N/A"
             android:textColor="@android:color/white"
             android:textSize="15sp" />
         <TextView
@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/day3_temperature"
             android:layout_centerHorizontal="true"
-            android:text="多云转晴"
+            android:text="N/A"
             android:textColor="@android:color/white"
             android:textSize="15sp" />
         <TextView
@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/day3_weatherTv"
             android:layout_centerHorizontal="true"
-            android:text="微风"
+            android:text="N/A"
             android:textColor="@android:color/white"
             android:textSize="15sp" />
     </RelativeLayout>
@@ -68,7 +68,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:text="星期五"
+            android:text="N/A"
             android:textColor="@android:color/white"
             android:textSize="15sp"/>
         <ImageView
@@ -86,7 +86,7 @@
             android:layout_below="@id/day4_weather"
             android:layout_marginTop="10dip"
             android:layout_centerHorizontal="true"
-            android:text="-2℃～7℃"
+            android:text="N/A"
             android:textColor="@android:color/white"
             android:textSize="15sp" />
         <TextView
@@ -95,7 +95,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/day4_temperature"
             android:layout_centerHorizontal="true"
-            android:text="多云转晴"
+            android:text="N/A"
             android:textColor="@android:color/white"
             android:textSize="15sp" />
         <TextView
@@ -104,7 +104,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/day4_weatherTv"
             android:layout_centerHorizontal="true"
-            android:text="微风"
+            android:text="N/A"
             android:textColor="@android:color/white"
             android:textSize="15sp" />
     </RelativeLayout>
@@ -121,7 +121,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:text="星期六"
+            android:text="N/A"
             android:textColor="@android:color/white"
             android:textSize="15sp"/>
         <ImageView
@@ -139,7 +139,7 @@
             android:layout_below="@id/day5_weather"
             android:layout_marginTop="10dip"
             android:layout_centerHorizontal="true"
-            android:text="-2℃～7℃"
+            android:text="N/A"
             android:textColor="@android:color/white"
             android:textSize="15sp" />
         <TextView
@@ -148,7 +148,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/day5_temperature"
             android:layout_centerHorizontal="true"
-            android:text="多云转晴"
+            android:text="N/A"
             android:textColor="@android:color/white"
             android:textSize="15sp" />
         <TextView
@@ -157,7 +157,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/day5_weatherTv"
             android:layout_centerHorizontal="true"
-            android:text="微风"
+            android:text="N/A"
             android:textColor="@android:color/white"
             android:textSize="15sp" />
     </RelativeLayout>

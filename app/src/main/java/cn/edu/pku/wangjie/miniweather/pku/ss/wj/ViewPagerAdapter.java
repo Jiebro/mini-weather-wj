@@ -5,9 +5,13 @@ import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.edu.pku.wangjie.miniweather.R;
 
 /**
  * Created by admin on 2016/12/6.
@@ -32,6 +36,7 @@ public class ViewPagerAdapter extends PagerAdapter {
         return  views.get(position);
     }
 
+
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
         container.removeView(views.get(position));
@@ -41,4 +46,11 @@ public class ViewPagerAdapter extends PagerAdapter {
     public boolean isViewFromObject(View view, Object object) {
         return (view == object);
     }
+
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
+    }
+
+
 }

@@ -21,6 +21,7 @@ import java.util.Map;
 import cn.edu.pku.wangjie.miniweather.R;
 import cn.edu.pku.wangjie.miniweather.pku.ss.wj.app.MyApplication;
 import cn.edu.pku.wangjie.miniweather.pku.ss.wj.bean.City;
+import cn.edu.pku.wangjie.miniweather.pku.ss.wj.util.NetUtil;
 
 /**
  * Created by admin on 2016/10/18.
@@ -44,6 +45,10 @@ public class SelectCity extends Activity implements View.OnClickListener{
         mTitleNameTv = (TextView)findViewById(R.id.title_name);
         mBackbtn = (ImageView)findViewById(R.id.title_back);
         mBackbtn.setOnClickListener(this);
+
+        //记录下原来的citycode，以防用户进入选择城市页面后不点击任何城市，selectCityCode为空
+        selectCityCode = this.getIntent().getStringExtra("cityCode");
+        Log.d("myWeather","原cityCode：" + selectCityCode);
 
         myApplication = (MyApplication)getApplication();
         list = myApplication.getCityList();
@@ -83,4 +88,5 @@ public class SelectCity extends Activity implements View.OnClickListener{
                 break;
         }
     }
+
 }

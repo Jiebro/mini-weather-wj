@@ -68,37 +68,37 @@ public class MyHandler extends DefaultHandler{
                     break;
                 case "fengxiang":
                     if (fengxiangCount == 0) {
-                        todayWeather.setFengxiang(currentValue);
+                        todayWeather.getWeatherDetails(0).setFengxiang(currentValue);
                         fengxiangCount++;
                     }
                     break;
                 case "fengli":
                     if (fengliCount == 0) {
-                        todayWeather.setFengli(currentValue);
+                        todayWeather.getWeatherDetails(0).setFengli(currentValue);
                         fengliCount++;
                     }
                     break;
                 case "date":
                     if (dateCount == 0) {
-                        todayWeather.setDate(currentValue);
+                        todayWeather.getWeatherDetails(0).setDate(currentValue);
                         dateCount++;
                     }
                     break;
                 case "high":
                     if (highCount == 0) {
-                        todayWeather.setHigh(currentValue);
+                        todayWeather.getWeatherDetails(0).setHigh(currentValue);
                         highCount++;
                     }
                     break;
                 case "low":
                     if (lowCount == 0) {
-                        todayWeather.setLow(currentValue);
+                        todayWeather.getWeatherDetails(0).setLow(currentValue);
                         lowCount++;
                     }
                     break;
                 case "type":
                     if (typeCount == 0) {
-                        todayWeather.setType(currentValue);
+                        todayWeather.getWeatherDetails(0).setType(currentValue);
                         typeCount++;
                     }
                     break;
