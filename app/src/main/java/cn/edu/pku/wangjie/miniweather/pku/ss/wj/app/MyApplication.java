@@ -49,7 +49,7 @@ public class MyApplication extends Application{
     }
 
     private boolean prepareCityList() {
-        mCityList = mCityDB.getAllCity();
+        mCityList = mCityDB.getAllCity("*");
         int i = 0;
         for(City city: mCityList){
             i++;
@@ -63,6 +63,11 @@ public class MyApplication extends Application{
     public List<City> getCityList(){
         return mCityList;
     }
+
+    public List<City> getCityList(String selectContent){
+        return mCityDB.getAllCity(selectContent);
+    }
+
 
     public static MyApplication getInstance(){
         return myApplication;

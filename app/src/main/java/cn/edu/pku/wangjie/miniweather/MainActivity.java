@@ -265,21 +265,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
         cityTv.setText(todayWeather.getCity());
         timeTv.setText(todayWeather.getUpdatetime() + "发布");
         humidityTv.setText("湿度：" + todayWeather.getShidu());
-        if (null == todayWeather.getWeatherDetails(0)){
-            Log.d("five","null");
-        }
         weekTv.setText(todayWeather.getWeatherDetails(0).getDate());
         pmDataTv.setText(todayWeather.getPm25());
 
-        //质量检测
-        if (todayWeather.getQuality() == null){
-            pmQualityTv.setText("N/A");
-        }
-        else{
+        //空气质量
+        if ( null != todayWeather.getQuality()){
             pmQualityTv.setText(todayWeather.getQuality());
         }
 
-        //pmQualityTv.setText(todayWeather.getQuality());
         cur_temperatureTv.setText("温度：" + todayWeather.getWendu() + "℃");
         temperatureTv.setText(todayWeather.getWeatherDetails(0).getHigh() + "~" + todayWeather.getWeatherDetails(0).getLow());
         climateTv.setText(todayWeather.getWeatherDetails(0).getType());
@@ -300,10 +293,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     //设置pm2.5图片
     private void setPM25(String pm25Value){
-        if(pm25Value == null){ //该地方没有pm2.5信息
-            pmImg.setImageResource(R.drawable.biz_plugin_weather_0_50);
-        }
-        else {
+        if( null != pm25Value){ //若该地方没有pm2.5信息，就不更新了
+
             int pm25 = Integer.parseInt(pm25Value);
             if (pm25 >= 0 && pm25 <= 50) {
                 pmImg.setImageResource(R.drawable.biz_plugin_weather_0_50);
