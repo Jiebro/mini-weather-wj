@@ -266,8 +266,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         timeTv.setText(todayWeather.getUpdatetime() + "发布");
         humidityTv.setText("湿度：" + todayWeather.getShidu());
         weekTv.setText(todayWeather.getWeatherDetails(0).getDate());
-        pmDataTv.setText(todayWeather.getPm25());
-
+        if (null != todayWeather.getPm25()) {
+            pmDataTv.setText(todayWeather.getPm25());
+        }
         //空气质量
         if ( null != todayWeather.getQuality()){
             pmQualityTv.setText(todayWeather.getQuality());

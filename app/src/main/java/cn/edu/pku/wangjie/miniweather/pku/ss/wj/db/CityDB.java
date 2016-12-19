@@ -23,15 +23,9 @@ public class CityDB {
         db = context.openOrCreateDatabase(path, Context.MODE_PRIVATE, null);
     }
 
-    public List<City> getAllCity(String selectContent) {
+    public List<City> getAllCity() {
         List<City> list = new ArrayList<City>();
-        Cursor c;
-        if (selectContent.equals("*")) {
-            c = db.rawQuery("SELECT * from " + CITY_TABLE_NAME, null);
-        }else{
-            c = db.rawQuery("Select * from " + CITY_TABLE_NAME + " where city ='" + selectContent + "'", null);
-        }
-        Log.d("EditText",selectContent);
+        Cursor c = db.rawQuery("SELECT * from " + CITY_TABLE_NAME, null);
         while (c.moveToNext()) {
             String province = c.getString(c.getColumnIndex("province"));
             String city = c.getString(c.getColumnIndex("city"));
@@ -43,7 +37,6 @@ public class CityDB {
             list.add(item);
             Log.d("EditText",city);
         }
-        Log.d("EditText",selectContent + "is not search");
             return list;
     }
 }
